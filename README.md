@@ -1,6 +1,6 @@
-# Discordeno Bot Template
+# Deno Docs Discord Bot
 
-This repo is meant as a template which you can use to create a Discord bot very easily using the Discordeno library.
+This bot although being designed mainly to test the [Discordeno](https://discordeno.js.org/) library, can also be used by anyone to have easy and beautiful access to their projects on their own server.
 
 [Discord Server](https://discord.gg/J4NqJ72)
 
@@ -10,23 +10,26 @@ This repo is meant as a template which you can use to create a Discord bot very 
 
 ## Step By Step
 
-1. Create your own repo using the template button. It is next to the button where you get the url to clone. It will say `Use this template` This is a template repo.
-2. Clone your own repo that Github created for you. `git clone url-here-for-your-repo`
-3. Create your `configs.ts` file in the main folder.
+1. Clone the repo. `git clone https://github.com/Skillz4Killz/deno-docs-bot.git`
+2. Create your `configs.ts` file in the main folder.
 
 ```ts
 export const configs = {
   token: "YOUR_TOKEN_HERE",
   prefix: "!",
   botID: "YOUR_BOT_ID_HERE",
+  // REPLACE THIS WITH YOUR GITHUB_USERNAME/REPO_NAME
+  repositoryURL: "denoland/deno",
 }
 ```
 
-4. Start the bot `deno --allow-net --allow-read mod.ts`
+4. Start the bot `deno run --allow-net --allow-read mod.ts`
 
 ## Features
 
-- [x] Events folder to keep all your events.
-- [x] Monitors to contain functions you want to run on all messages
-- [x] Commands to contain all your bots amazing commands.
-- [x] Inhibitors to contain pre-check requirements on commands before running a command
+- [x] Whenever a user types #123 anywhere in the message it will add a reaction. If that reaction is tapped, the bot will show information for that repositories issue or pull request.
+- [x] Adds a 🗑 to all messages sent by the bot so it can be deleted at ease. To prevent spam.
+
+## Acknowledgements
+
+- [Klasa Docs Bot](https://github.com/dirigeants/klasa-docs-bot)
