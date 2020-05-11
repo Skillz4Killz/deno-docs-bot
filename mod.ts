@@ -42,7 +42,7 @@ export const BotOptions = {
   // Replace this with your bot's ID.
   botID: configs.botID,
   // Pick the intents you wish to have for your bot.
-  intents: [Intents.GUILDS, Intents.GUILD_MESSAGES],
+  intents: [Intents.GUILDS, Intents.GUILD_MESSAGES, Intents.GUILD_MESSAGE_REACTIONS],
   // These are all your event handler functions. Currently, being imported from a file called eventHandlers from the events folder
   eventHandlers,
 };

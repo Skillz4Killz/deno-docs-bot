@@ -13,10 +13,14 @@ export const reactorMonitor = async (message: Message) => {
   // A possible number was found
   const [issue, pull] = await Promise.all([
     fetch(
-      `https://api.github.com/repos/${configs.repositoryURL}/pulls/${number}`,
+      `https://api.github.com/repos/${configs.repositoryURL}/issues/${
+        number.substring(1)
+      }`,
     ).then((res) => res.json()),
     fetch(
-      `https://api.github.com/repos/${configs.repositoryURL}/pulls/${number}`,
+      `https://api.github.com/repos/${configs.repositoryURL}/pulls/${
+        number.substring(1)
+      }`,
     ).then((res) => res.json()),
   ]);
 
