@@ -61,7 +61,7 @@ export const reactionAdd = async (
         },
         author: {
           name: data.user.login,
-          iconURL: data.user.avatar_url,
+          icon_url: data.user.avatar_url,
           url: data.user.html_url,
         },
         title: data.title,
