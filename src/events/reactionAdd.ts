@@ -1,10 +1,11 @@
-import { Message } from "https://raw.githubusercontent.com/Skillz4Killz/Discordeno/master/structures/message.ts";
+import { Message } from "https://raw.githubusercontent.com/Skillz4Killz/Discordeno/v1/structures/message.ts";
 import { configs } from "../../configs.ts";
 import {
   MessageReactionPayload,
   Reaction_Payload,
-} from "https://raw.githubusercontent.com/Skillz4Killz/Discordeno/master/types/message.ts";
-import { cache } from "https://raw.githubusercontent.com/Skillz4Killz/Discordeno/master/utils/cache.ts";
+} from "https://raw.githubusercontent.com/Skillz4Killz/Discordeno/v1/types/message.ts";
+import { cache } from "https://raw.githubusercontent.com/Skillz4Killz/Discordeno/v1/utils/cache.ts";
+
 function isMessage(
   message: Message | MessageReactionPayload,
 ): message is Message {

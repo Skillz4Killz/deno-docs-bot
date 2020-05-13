@@ -1,10 +1,10 @@
-import Client from "https://raw.githubusercontent.com/Skillz4Killz/Discordeno/master/module/client.ts";
+import Client from "https://raw.githubusercontent.com/Skillz4Killz/Discordeno/v1/module/client.ts";
 import { configs } from "./configs.ts";
-import { Intents } from "https://raw.githubusercontent.com/Skillz4Killz/Discordeno/master/types/options.ts";
+import { Intents } from "https://raw.githubusercontent.com/Skillz4Killz/Discordeno/v1/types/options.ts";
 import { eventHandlers } from "./src/events/eventHandlers.ts";
-import { Message } from "https://raw.githubusercontent.com/Skillz4Killz/Discordeno/master/structures/message.ts";
+import { Message } from "https://raw.githubusercontent.com/Skillz4Killz/Discordeno/v1/structures/message.ts";
 import { Command } from "./src/types/commands.ts";
-import { Guild } from "https://raw.githubusercontent.com/Skillz4Killz/Discordeno/master/structures/guild.ts";
+import { Guild } from "https://raw.githubusercontent.com/Skillz4Killz/Discordeno/v1/structures/guild.ts";
 
 export const botCache = {
   commands: new Map<string, Command>(),
@@ -42,7 +42,11 @@ export const BotOptions = {
   // Replace this with your bot's ID.
   botID: configs.botID,
   // Pick the intents you wish to have for your bot.
-  intents: [Intents.GUILDS, Intents.GUILD_MESSAGES, Intents.GUILD_MESSAGE_REACTIONS],
+  intents: [
+    Intents.GUILDS,
+    Intents.GUILD_MESSAGES,
+    Intents.GUILD_MESSAGE_REACTIONS,
+  ],
   // These are all your event handler functions. Currently, being imported from a file called eventHandlers from the events folder
   eventHandlers,
 };

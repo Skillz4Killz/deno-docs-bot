@@ -1,4 +1,4 @@
-import { Message } from "https://raw.githubusercontent.com/Skillz4Killz/Discordeno/master/structures/message.ts";
+import { Message } from "https://raw.githubusercontent.com/Skillz4Killz/Discordeno/v1/structures/message.ts";
 import { configs } from "../../configs.ts";
 
 export const reactorMonitor = async (message: Message) => {
