@@ -1,32 +1,35 @@
-import { Message } from "https://raw.githubusercontent.com/Skillz4Killz/Discordeno/v1/structures/message.ts";
-import { configs } from "../../configs.ts";
 import {
+  addReaction,
+  botID,
+  cache,
+  deleteMessage,
+  Message,
   MessageReactionPayload,
-  Reaction_Payload,
-} from "https://raw.githubusercontent.com/Skillz4Killz/Discordeno/v1/types/message.ts";
-import { cache } from "https://raw.githubusercontent.com/Skillz4Killz/Discordeno/v1/utils/cache.ts";
+} from "../../deps.ts";
+import { botCache } from "../../mod.ts";
+import { configs } from "../../configs.ts";
+import { Embed } from "../utils/Embed.ts";
+import { sendEmbed } from "../utils/helpers.ts";
+import { processReactionCollectors } from "../utils/collectors.ts";
 
 function isMessage(
   message: Message | MessageReactionPayload,
 ): message is Message {
-  return (message as Message).raw !== undefined;
+  return (message as Message).content !== undefined;
 }
 
-export const reactionAdd = async (
-  message: Message | MessageReactionPayload,
-  emoji: Reaction_Payload,
-  userID: string,
-) => {
-  if (!isMessage(message) || !message.guild_id) return;
+botCache.eventHandlers.reactionAdd = async function (message, emoji, userID) {
+  // Process reaction collectors.
+  processReactionCollectors(message, emoji, userID);
 
-  const guild = cache.guilds.get(message.guild_id);
+  if (userID === botID) return;
+
+  if (!isMessage(message) || !message.guildID) return;
+
+  const guild = cache.guilds.get(message.guildID);
   if (!guild) return;
 
-  const reactingUser = cache.users.get(userID);
-  if (!reactingUser) return;
-
   if (emoji.name === "🔖") {
-    if (reactingUser.bot) return;
     // If the message does not have a issue/pull request number in it cancel.
     const number = message.content.split(" ").find((word) =>
       word.startsWith("#") && Number(word.substring(1))
@@ -54,48 +57,36 @@ export const reactionAdd = async (
     else if (!isIssue) data = pull;
     else return;
 
-    const response = await message.channel.sendMessage({
-      embed: {
-        description: data.body.substring(0, 2048),
-        thumbnail: {
-          url: "https://i.imgur.com/GsVUS41.gif",
-        },
-        author: {
-          name: data.user.login,
-          icon_url: data.user.avatar_url,
-          url: data.user.html_url,
-        },
-        title: data.title,
-        url: data.html_url,
-        timestamp: new Date(data.created_at).toISOString(),
-        fields: [
-          { name: "__**Status:**__", value: data.state, inline: true },
-          {
-            name: "__**Labels:**__",
-            value: data.labels.map((label: { name: any }) => label.name).join(
-              ", ",
-            ) || "None",
-            inline: true,
-          },
-        ],
-        color:
-          // If it is an issue
-          isIssue
-            ? data.state === "open" ? 0xd1d134 : 0x2d32be
-            : // If it is a pull request
-              data.state === "open"
-              ? 0x2cbe4e
-              : data.state === "closed"
-              ? 0xcb2431
-              : // Merged PR
-                0x6f42c1,
-      },
-    });
+    const isOpen = data.state === "open";
 
-    response.addReaction("🗑");
+    const embed = new Embed()
+      .setDescription(data.body)
+      .setThumbnail("https://i.imgur.com/GsVUS41.gif")
+      .setAuthor(data.user.login, data.user.avatar_url, data.user.html_url)
+      .setTitle(data.title, data.html_url)
+      .setTimestamp(data.created_at)
+      .addField("__**Status:**__", data.state, true)
+      .addField(
+        "__**Labels:**__",
+        data.labels.map((label: { name: any }) => label.name).join(", ") ||
+          "None",
+        true,
+      )
+      .setColor( // If it is an issue
+        isIssue ? isOpen ? 0xd1d134 : 0x2d32be : // If it is a pull request
+          isOpen
+          ? 0x2cbe4e
+          : !isOpen
+          ? 0xcb2431
+          : // Merged PR
+            0x6f42c1,
+      );
+
+    const response = await sendEmbed(message.channel, embed);
+    addReaction(response.channelID, response.id, "🗑");
   } else if (emoji.name === "🗑") {
-    if (message.author.id !== configs.botID) return;
-    if (userID === configs.botID) return;
-    message.delete().catch(() => undefined);
+    if (message.author.id !== botID) return;
+    if (userID === botID) return;
+    deleteMessage(message).catch(() => undefined);
   }
 };

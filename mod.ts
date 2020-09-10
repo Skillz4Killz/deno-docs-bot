@@ -1,54 +1,70 @@
-import Client from "https://raw.githubusercontent.com/Skillz4Killz/Discordeno/v1/module/client.ts";
+import Client, {
+  Collection,
+  Message,
+  Guild,
+  Intents,
+  logger,
+} from "./deps.ts";
 import { configs } from "./configs.ts";
-import { Intents } from "https://raw.githubusercontent.com/Skillz4Killz/Discordeno/v1/types/options.ts";
-import { eventHandlers } from "./src/events/eventHandlers.ts";
-import { Message } from "https://raw.githubusercontent.com/Skillz4Killz/Discordeno/v1/structures/message.ts";
-import { Command } from "./src/types/commands.ts";
-import { Guild } from "https://raw.githubusercontent.com/Skillz4Killz/Discordeno/v1/structures/guild.ts";
+import { Command, Argument, PermissionLevels } from "./src/types/commands.ts";
+import { importDirectory } from "./src/utils/helpers.ts";
+import { Monitor } from "./src/types/monitors.ts";
+import { Task } from "./src/types/tasks.ts";
+import { loadLanguages } from "./src/utils/i18next.ts";
+import { CustomEvents } from "./src/types/events.ts";
+import { MessageCollector, ReactionCollector } from "./src/types/collectors.ts";
+
+logger.info(
+  "Beginning Bot Startup Process. This can take a little bit depending on your system. Loading now...",
+);
 
 export const botCache = {
-  commands: new Map<string, Command>(),
-  commandAliases: new Map<string, string>(),
-  guildPrefixes: new Map<string, string>(),
-  inhibitors: new Map<
+  arguments: new Collection<string, Argument>(),
+  commands: new Collection<string, Command>(),
+  eventHandlers: {} as CustomEvents,
+  guildPrefixes: new Collection<string, string>(),
+  guildLanguages: new Collection<string, string>(),
+  messageCollectors: new Collection<string, MessageCollector>(),
+  reactionCollectors: new Collection<string, ReactionCollector>(),
+  inhibitors: new Collection<
     string,
-    (message: Message, command: Command, guild?: Guild) => boolean
+    (message: Message, command: Command, guild?: Guild) => Promise<boolean>
   >(),
-};
-
-const importDirectory = async (path: string) => {
-  const files = Deno.readDirSync(Deno.realPathSync(path));
-
-  for (const file of files) {
-    if (!file.name) continue;
-
-    const currentPath = `${path}/${file.name}`;
-    if (file.isFile) {
-      await import(currentPath);
-      continue;
-    }
-
-    importDirectory(currentPath);
-  }
+  monitors: new Collection<string, Monitor>(),
+  permissionLevels: new Collection<
+    PermissionLevels,
+    (message: Message, command: Command, guild?: Guild) => Promise<boolean>
+  >(),
+  tasks: new Collection<string, Task>(),
 };
 
 // Forces deno to read all the files which will fill the commands/inhibitors cache etc.
 await Promise.all(
-  ["./src/commands", "./src/inhibitors"].map((path) => importDirectory(path)),
+  [
+    "./src/commands",
+    "./src/inhibitors",
+    "./src/events",
+    "./src/arguments",
+    "./src/monitors",
+    "./src/tasks",
+    "./src/permissionLevels",
+    "./src/events",
+  ].map(
+    (path) => importDirectory(Deno.realPathSync(path)),
+  ),
 );
 
-export const BotOptions = {
+// Loads languages
+await loadLanguages();
+
+Client({
   token: configs.token,
-  // Replace this with your bot's ID.
-  botID: configs.botID,
   // Pick the intents you wish to have for your bot.
   intents: [
     Intents.GUILDS,
     Intents.GUILD_MESSAGES,
     Intents.GUILD_MESSAGE_REACTIONS,
   ],
-  // These are all your event handler functions. Currently, being imported from a file called eventHandlers from the events folder
-  eventHandlers,
-};
-
-Client(BotOptions);
+  // These are all your event handler functions. Imported from the events folder
+  eventHandlers: botCache.eventHandlers,
+});

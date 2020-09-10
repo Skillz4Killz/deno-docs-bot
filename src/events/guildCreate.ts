@@ -1,8 +1,7 @@
-import { Guild } from "https://raw.githubusercontent.com/Skillz4Killz/Discordeno/v1/structures/guild.ts";
-import { logGreen } from "https://raw.githubusercontent.com/Skillz4Killz/Discordeno/v1/utils/logger.ts";
+import { Guild, logger } from "../../deps.ts";
 
 export const guildCreate = (guild: Guild) => {
-  logGreen(
+  logger.info(
     `[EVENT=GuildCreate]: ${guild.name} with ${guild.memberCount} members.`,
   );
 };

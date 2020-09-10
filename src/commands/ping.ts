@@ -1,27 +1,33 @@
 // This file is meant to show how you can create multiple commands in the same file if you wish.
-import { Message } from "https://raw.githubusercontent.com/Skillz4Killz/Discordeno/v1/structures/message.ts";
 import { botCache } from "../../mod.ts";
-import { cache } from "https://raw.githubusercontent.com/Skillz4Killz/Discordeno/v1/utils/cache.ts";
-
-const pingCommand = (message: Message) => {
-  return message.channel.sendMessage(
-    `Ping MS: ${Date.now() - message.timestamp}ms`,
-  );
-};
-
-const devPingCommand = (message: Message) => {
-  return message.channel.sendMessage(
-    `Ping MS: ${Date.now() -
-      message
-        .timestamp}ms | Guilds: ${cache.guilds.size} | Users: ${cache.users.size}`,
-  );
-};
+import { cache, sendMessage } from "../../deps.ts";
 
 botCache.commands.set(`ping`, {
-  callback: pingCommand,
+  name: `ping`,
+  description: "commands/ping:DESCRIPTION",
+  botChannelPermissions: ["SEND_MESSAGES"],
+  execute: function (message) {
+    sendMessage(
+      message.channel,
+      `Ping MS: ${Date.now() - message.timestamp}ms`,
+    );
+  },
 });
 
-botCache.commands.set(`dev_ping`, {
+botCache.commands.set(`devping`, {
+  name: `devping`,
   guildOnly: true,
-  callback: devPingCommand,
+  execute: function (message) {
+    let memberCount = 0;
+    cache.guilds.forEach((guild) => {
+      memberCount += guild.members.size;
+    });
+
+    sendMessage(
+      message.channel,
+      `Ping MS: ${Date.now() -
+        message
+          .timestamp}ms | Guilds: ${cache.guilds.size} | Users: ${memberCount}`,
+    );
+  },
 });
